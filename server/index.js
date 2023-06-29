@@ -14,13 +14,15 @@ app.use(express.json())
 app.post("/addIngredients", async(req, res) => {
     try {
         console.log("add ingredients");
-        console.log(req.body);
-        const {name, count, date} = req.body;
-        const newIngredient = await db.query(
-            "INSERT INTO ingredients (ingredient_name, ingredient_count, purchase_date) VALUES($1, $2, $3) RETURNING *;",
-            [name, count, date]
-        );
-        console.log(newIngredient.rows[0])
+        const {ingredients} = req.body;
+
+        const addIngredient = "INSERT INTO ingredients (ingredient_name, ingredient_count, purchase_date) VALUES($1, $2, $3) RETURNING *;";
+        for (const ingredient of ingredients) {
+            await db.query(addIngredient, [ingredient.name, ingredient.count, ingredient.date]);
+        }
+        const allRows = await db.query("SELECT * FROM ingredients;");
+        console.log(allRows.rows);
+        
         res.json("successfully added ingredients")
     } catch (error) {
         console.error(error.message);
@@ -28,6 +30,28 @@ app.post("/addIngredients", async(req, res) => {
 })
 
 // REMOVE ingredients and counts from the db
+app.put("/removeIngredients", async(req, res) => {
+    try {
+        console.log("update ingredients");
+        console.log(req.body);
+        const {name, count, date} = req.body;
+        const ingredientQuery = await db.query(
+            "SELECT ingredient_count FROM ingredients WHERE ingredient_name = $1;",
+            [name]
+        );
+        const currentIngredientCount = ingredientQuery.rows[0].ingredient_count;
+        const updatedCount = Math.max(0, currentIngredientCount - count);
+        
+        const updateQuery = await db.query(
+            "UPDATE ingredients SET ingredient_count = $1 WHERE ingredient_name = $2;",
+            [updatedCount, name]
+        );
+
+        res.json("successfully removed ingredients")
+    } catch (error) {
+        console.error(error.message);
+    }
+})
 
 // USE a recipe (consumes ingredients)
 
@@ -36,6 +60,10 @@ app.get("/pantry", async(req, res) => {
     try {
         console.log("pantry view request");
         console.log(req.body);
+        const viewPantry = await db.query(
+            "SELECT * FROM ingredients;"
+        );
+        console.log(viewPantry.rows)
         res.json("Pantry request received")
     } catch (error) {
         console.error(error.message);
