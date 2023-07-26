@@ -31,8 +31,22 @@ def inven_add_ingredient(args):
             print(f"Request failed with status code: {res.status_code}")
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
-    pass
 
 
 def inven_use_ingredient(args):
     print(args)
+    route = 'removeIngredients'
+    data = {
+        "name": args[1],
+        "count": args[0]
+    }
+    print(data)
+    try:
+        res = requests.put(url + route, json=data)
+        if res.status_code == 200:
+            print("Request successful. Response:")
+            print(res.json())
+        else:
+            print(f"Request failed with status code: {res.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
