@@ -22,6 +22,10 @@ def main(args):
         helper.inven_add_ingredient(' '.join(args.addIngredient))
     elif (args.useIngredient):
         helper.inven_use_ingredient(args.useIngredient)
+    elif (args.pantry):
+        helper.inven_see_pantry()
+    elif (args.aggregatePantry):
+        helper.inven_see_aggregate_pantry()
 
 
 if __name__ == "__main__":
@@ -32,8 +36,14 @@ if __name__ == "__main__":
     parser.add_argument("-ai", "--addIngredient", type=str, nargs='+',
                         help="add ingredient to pantry")
 
-    parser.add_argument("-ui", "--useIngredient", type=str, nargs='+',
+    parser.add_argument("-ui", "--useIngredient", type=str, nargs=2,
                         help="use a single ingredient")
+
+    parser.add_argument("-p", "--pantry", action='store_true',
+                        help="view current pantry")
+
+    parser.add_argument("-P", "--aggregatePantry", action='store_true',
+                        help="view current pantry with aggregated values")
 
     # Parse the arguments
     args = parser.parse_args()
