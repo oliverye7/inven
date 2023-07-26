@@ -6,17 +6,22 @@ url = "http://localhost:4000/"
 
 def inven_add_ingredient(args):
     print("add ingredients")
-    print(args)
     route = 'addIngredients'
-    data = {"ingredients": [
-        {
-            "name": args[1],
-            "count": args[0],
-            "date": str(datetime.today().date()),
+    ingredients = args.split(", ")
+    date = str(datetime.today().date())
+
+    data = {"ingredients": []}
+    for i in ingredients:
+        count, name = i.split(" ")
+        ingredient_data = {
+            "name": name,
+            "count": count,
+            "date": date,
         }
-    ]}
+        data["ingredients"].append(ingredient_data)
 
     print(data)
+
     try:
         res = requests.post(url + route, json=data)
         if res.status_code == 200:

@@ -19,7 +19,7 @@ def main(args):
     # Your main script logic here
     print(args)
     if (args.addIngredient):
-        helper.inven_add_ingredient(args.addIngredient)
+        helper.inven_add_ingredient(' '.join(args.addIngredient))
     elif (args.useIngredient):
         helper.inven_use_ingredient(args.useIngredient)
 
