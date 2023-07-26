@@ -34,5 +34,5 @@ def inven_add_ingredient(args):
     pass
 
 
-def inven_use_ingredient():
-    pass
+def inven_use_ingredient(args):
+    print(args)

@@ -8,6 +8,32 @@ const app = express();
 app.use(cors());
 app.use(express.json())
 
+// HELPER(s)
+function getMostRecentlyAdded(ingredientList) {
+    const sortedIngredients = ingredientList.sort((a, b) => {
+      const dateComparison = new Date(b.purchase_date) - new Date(a.purchase_date);
+      if (dateComparison === 0) {
+        return b.ingredient_id - a.ingredient_id;
+      }
+      return dateComparison;
+    });
+  
+    return sortedIngredients[0];
+}
+
+async function getIngredientTotal(ingredient) {
+    const ingredientQuery = await db.query(
+        "SELECT * FROM ingredients WHERE ingredient_name = $1;",
+        [ingredient]
+    );
+    console.log(ingredientQuery.rows)
+    let sum = 0;
+    for (const i of ingredientQuery.rows) {
+        sum += i.ingredient_count;
+    }
+    return sum;
+}
+
 //ROUTES
 
 // ADD ingredients and counts to the db
@@ -33,22 +59,43 @@ app.post("/addIngredients", async(req, res) => {
 app.put("/removeIngredients", async(req, res) => {
     try {
         console.log("update ingredients");
-        console.log(req.body);
-        const {name, count, date} = req.body;
-        const ingredientQuery = await db.query(
-            "SELECT ingredient_id, ingredient_name, purchase_date FROM ingredients WHERE ingredient_name = $1;",
+        let {name, count} = req.body;
+        const totalCount = await getIngredientTotal(name);
+        let ingredientQuery = await db.query(
+            "SELECT * FROM ingredients WHERE ingredient_name = $1;",
             [name]
         );
-        console.log(ingredientQuery.rows);
-        const currentIngredientCount = ingredientQuery.rows[0].ingredient_count;
-        const updatedCount = Math.max(0, currentIngredientCount - count);
-        
-        const updateQuery = await db.query(
-            "UPDATE ingredients SET ingredient_count = $1 WHERE ingredient_name = $2;",
-            [updatedCount, name]
-        );
 
-        res.json("successfully removed ingredients")
+        if (ingredientQuery.rows.length == 0) {
+            res.status(404).json("ingredient not in pantry")
+        } else if (count > totalCount) {
+            res.status(400).json("attempted to remove too many items from pantry")
+        } else {
+            while (count > 0) {
+                console.log("removed entry")
+                ingredientQuery = await db.query(
+                    "SELECT * FROM ingredients WHERE ingredient_name = $1;",
+                    [name]
+                );
+                let latestIngredient = getMostRecentlyAdded(ingredientQuery.rows)
+                let currentIngredientCount = latestIngredient.ingredient_count;
+                let updatedCount = Math.max(0, currentIngredientCount - count);
+                count -= currentIngredientCount
+
+                if (updatedCount === 0) {
+                    await db.query(
+                      "DELETE FROM ingredients WHERE ingredient_name = $1 AND ingredient_id = $2;",
+                      [name, latestIngredient.ingredient_id]
+                    );
+                } else {
+                    await db.query(
+                      "UPDATE ingredients SET ingredient_count = $1 WHERE ingredient_name = $2 AND ingredient_id = $3;",
+                      [updatedCount, name, latestIngredient.ingredient_id]
+                    );
+                }
+            }
+        }
+        res.status(200).json("consumed ingredient")
     } catch (error) {
         console.error(error.message);
     }
