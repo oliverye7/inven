@@ -5,8 +5,8 @@ url = "http://localhost:4000/"
 
 
 def inven_add_ingredient(args):
-    print("add ingredients")
     route = 'addIngredients'
+    args = ' '.join(args.ingredient)
     ingredients = args.split(", ")
     date = str(datetime.today().date())
 
@@ -19,13 +19,9 @@ def inven_add_ingredient(args):
             "date": date,
         }
         data["ingredients"].append(ingredient_data)
-
-    print(data)
-
     try:
         res = requests.post(url + route, json=data)
         if res.status_code == 200:
-            print("Request successful. Response:")
             print(res.json())
         else:
             print(f"Request failed with status code: {res.status_code}")
@@ -34,17 +30,15 @@ def inven_add_ingredient(args):
 
 
 def inven_use_ingredient(args):
-    print(args)
+    args = [args.quantity, args.ingredient]
     route = 'removeIngredients'
     data = {
         "name": args[1],
         "count": args[0]
     }
-    print(data)
     try:
         res = requests.put(url + route, json=data)
         if res.status_code == 200:
-            print("Request successful. Response:")
             print(res.json())
         else:
             print(f"Request failed with status code: {res.status_code}")

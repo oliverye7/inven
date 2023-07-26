@@ -1,16 +1,3 @@
-# import sys
-#
-# if __name__ == "__main__":
-#    # Join all the command line arguments (excluding the script name)
-#    cmd = sys.argv[1:]
-#    print(cmd)
-#
-#    if (cmd[0] == 'add'):
-#    elif (cmd[0] == 'use'):
-#        route = 'removeIngredients'
-#        data = {}
-#
-
 import argparse
 import helper
 
@@ -18,11 +5,7 @@ import helper
 def main(args):
     # Your main script logic here
     print(args)
-    if (args.addIngredient):
-        helper.inven_add_ingredient(' '.join(args.addIngredient))
-    elif (args.useIngredient):
-        helper.inven_use_ingredient(args.useIngredient)
-    elif (args.pantry):
+    if (args.pantry):
         helper.inven_see_pantry()
     elif (args.aggregatePantry):
         helper.inven_see_aggregate_pantry()
@@ -32,12 +15,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Basic Argument Parsing Script")
 
-    # Add arguments
-    parser.add_argument("-ai", "--addIngredient", type=str, nargs='+',
-                        help="add ingredient to pantry")
+    subparsers = parser.add_subparsers(title="subcommands", dest="action")
 
-    parser.add_argument("-ui", "--useIngredient", type=str, nargs=2,
-                        help="use a single ingredient")
+    add_parser = subparsers.add_parser("add", help="add ingredient to pantry")
+    add_parser.add_argument("ingredient", type=str,
+                            nargs='+', help="ingredient(s) to add")
+    add_parser.set_defaults(func=helper.inven_add_ingredient)
+
+    use_parser = subparsers.add_parser("use", help="use a single ingredient")
+    use_parser.add_argument("quantity", type=int,
+                            help="quantity of the ingredient to use")
+    use_parser.add_argument("ingredient", type=str, help="ingredient to use")
+    use_parser.set_defaults(func=helper.inven_use_ingredient)
 
     parser.add_argument("-p", "--pantry", action='store_true',
                         help="view current pantry")
@@ -45,8 +34,9 @@ if __name__ == "__main__":
     parser.add_argument("-P", "--aggregatePantry", action='store_true',
                         help="view current pantry with aggregated values")
 
-    # Parse the arguments
     args = parser.parse_args()
 
-    # Call the main function with parsed arguments
-    main(args)
+    if hasattr(args, 'func') and callable(args.func):
+        args.func(args)
+    else:
+        main(args)
