@@ -36,9 +36,10 @@ app.put("/removeIngredients", async(req, res) => {
         console.log(req.body);
         const {name, count, date} = req.body;
         const ingredientQuery = await db.query(
-            "SELECT ingredient_count FROM ingredients WHERE ingredient_name = $1;",
+            "SELECT ingredient_id, ingredient_name, purchase_date FROM ingredients WHERE ingredient_name = $1;",
             [name]
         );
+        console.log(ingredientQuery.rows);
         const currentIngredientCount = ingredientQuery.rows[0].ingredient_count;
         const updatedCount = Math.max(0, currentIngredientCount - count);
         
@@ -64,7 +65,8 @@ app.get("/pantry", async(req, res) => {
             "SELECT * FROM ingredients;"
         );
         console.log(viewPantry.rows)
-        res.json("Pantry request received")
+        res.json(viewPantry.rows)
+        //res.json("Pantry request received")
     } catch (error) {
         console.error(error.message);
     }
