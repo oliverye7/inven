@@ -134,6 +134,38 @@ app.post("/addRecipe", async(req, res) => {
     }
 })
 
+app.delete("/removeRecipe", async(req, res) => {
+    try {
+        const {recipe} = req.body;
+
+        let getRecipe = await db.query("SELECT recipe_id FROM recipes WHERE recipe_name = $1;", [recipe])
+        console.log(getRecipe.rows)
+        if (getRecipe.rows.length === 0) {
+          return res.status(404).json({ error: "Recipe is not in the db" });
+        }
+  
+        const recipeId = getRecipe.rows[0].recipe_id;
+  
+        // Delete the recipe ingredients from the recipeIngredients table
+        await db.query(
+          "DELETE FROM recipeIngredients WHERE recipe_id = $1;",
+          [recipeId]
+        );
+
+        // Delete the recipe from the recipes table
+        await db.query(
+          "DELETE FROM recipes WHERE recipe_id = $1;",
+          [recipeId]
+        );
+  
+
+
+        res.json("successfully removed recipe")
+    } catch (error) {
+        console.error(error.message);
+    }
+})
+
 // VIEW all available recipes
 app.get("/recipes", async(req, res) => {
     try {
