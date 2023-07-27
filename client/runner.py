@@ -52,6 +52,14 @@ if __name__ == "__main__":
         "shoppingList", type=str, nargs="+", help="csv of recipe names")
     shopping_parser.set_defaults(func=helper.inven_shopping_list)
 
+    login_parser = subparsers.add_parser(
+        "login", help="log in to the inven server using your GitHub account")
+    login_parser.set_defaults(func=helper.inven_login)
+
+    whoami_parser = subparsers.add_parser(
+        "whoami", help="view your current login status")
+    whoami_parser.set_defaults(func=helper.inven_whoami)
+
     parser.add_argument("-p", "--pantry", action='store_true',
                         help="view current pantry")
 

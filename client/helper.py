@@ -1,6 +1,7 @@
 import requests
 from datetime import datetime
 import toml
+import auth
 
 url = "http://localhost:4000/"
 
@@ -206,3 +207,10 @@ def inven_shopping_list(args):
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
     print(buy)
+
+def inven_login(args):
+    auth.login()
+
+def inven_whoami(args):
+    login = auth.github_username()
+    print(f"Logged in as {login}")
