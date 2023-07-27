@@ -25,7 +25,7 @@ def inven_add_ingredient(args):
         if res.status_code == 200:
             print(res.json())
         else:
-            print(f"Request failed with status code: {res.status_code}")
+            print("ERR " + str(res.status_code) + ": " + res.json())
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
 
@@ -42,7 +42,7 @@ def inven_use_ingredient(args):
         if res.status_code == 200:
             print(res.json())
         else:
-            print(f"Request failed with status code: {res.status_code}")
+            print("ERR " + str(res.status_code) + ": " + res.json())
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
 
@@ -64,7 +64,7 @@ def inven_see_aggregate_pantry():
             for i in pantry:
                 print(i + ", " + str(pantry[i]) + " units.")
         else:
-            print(f"Request failed with status code: {res.status_code}")
+            print("ERR " + str(res.status_code) + ": " + res.json())
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
 
@@ -82,7 +82,7 @@ def inven_see_pantry():
                     i['purchase_date'][0:10]
                 print(f"{ingredient_str.ljust(30)} {purchase_date_str}")
         else:
-            print(f"Request failed with status code: {res.status_code}")
+            print("ERR " + str(res.status_code) + ": " + res.json())
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
 
@@ -98,7 +98,7 @@ def inven_add_recipe(args):
                         "ERR: Recipe already exists in the database. Perhaps you want to try rerunning with 'update' instead.")
                     return
         else:
-            print(f"Request failed with status code: {res.status_code}")
+            print("ERR " + str(res.status_code) + ": " + res.json())
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
 
@@ -125,7 +125,7 @@ def inven_add_recipe(args):
         if res.status_code == 200:
             print(res.json())
         else:
-            print(f"Request failed with status code: {res.status_code}")
+            print("ERR " + str(res.status_code) + ": " + res.json())
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
 
@@ -143,7 +143,7 @@ def inven_use_recipe(args):
             if (not isRecipeKnown):
                 print(f"ERR. Inven does not contain recipe: {args.recipe}")
         else:
-            print(f"Request failed with status code: {res.status_code}")
+            print("ERR " + str(res.status_code) + ": " + res.json())
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
 
@@ -174,9 +174,8 @@ def inven_remove_recipe(args):
         res = requests.delete(url + route, json={"recipe": args.recipe})
         if res.status_code == 200:
             print(res.json())
-            # for recipe in res.json():
         else:
-            print(f"Request failed with status code: {res.status_code}")
+            print("ERR " + str(res.status_code) + ": " + res.json())
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
 
@@ -202,9 +201,8 @@ def inven_shopping_list(args):
                                 buy[name] += count
                             else:
                                 buy[name] = count
-                # for recipe in res.json():
             else:
-                print(f"Request failed with status code: {res.status_code}")
+                print("ERR " + str(res.status_code) + ": " + res.json())
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
     print(buy)
