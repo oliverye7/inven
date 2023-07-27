@@ -113,7 +113,7 @@ def inven_add_recipe(args):
     }
 
     for i in toml_data['ingredients']:
-        if (type(toml_data['ingredients'][i]) == int):
+        if (type(toml_data['ingredients'][i]) == int or type(toml_data['ingredients'][i]) == float):
             ingredient_data = {
                 "ingredient_name": i,
                 "ingredient_count": toml_data['ingredients'][i],
