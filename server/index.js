@@ -36,6 +36,12 @@ async function getIngredientTotal(ingredient) {
 
 //ROUTES
 
+app.get("/ingredientTotal", async(req, res) => {
+    const {ingredient} = req.body;
+    const count = await getIngredientTotal(ingredient)
+    res.json(count)
+})
+
 // ADD ingredients and counts to the db
 app.post("/addIngredients", async(req, res) => {
     try {
@@ -175,6 +181,20 @@ app.get("/recipes", async(req, res) => {
         );
         res.json(recipes.rows)
         //res.json("Pantry request received")
+    } catch (error) {
+        console.error(error.message);
+    }
+})
+
+app.get("/recipeIngredients", async(req, res) => {
+    try {
+        const {recipe} = req.body
+        let recipeId = await db.query("SELECT recipe_id FROM recipes WHERE recipe_name = $1", [recipe])
+        recipeId = recipeId.rows[0]['recipe_id']
+
+        let ingredients = await db.query("SELECT ingredient_name, ingredient_count FROM recipeIngredients WHERE recipe_id = $1", [recipeId])
+
+        res.json(ingredients.rows)
     } catch (error) {
         console.error(error.message);
     }

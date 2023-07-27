@@ -46,6 +46,12 @@ if __name__ == "__main__":
         "recipe", type=str, help="name of recipe to be updated")
     update_parser.set_defaults(func=helper.inven_update_recipe)
 
+    shopping_parser = subparsers.add_parser(
+        "shopping", help="given a list of csv, generates a shopping list taking into acount existing ingredients in the pantry")
+    shopping_parser.add_argument(
+        "shoppingList", type=str, nargs="+", help="csv of recipe names")
+    shopping_parser.set_defaults(func=helper.inven_shopping_list)
+
     parser.add_argument("-p", "--pantry", action='store_true',
                         help="view current pantry")
 

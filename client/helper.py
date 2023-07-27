@@ -95,7 +95,7 @@ def inven_add_recipe(args):
             for recipe in res.json():
                 if (recipe['recipe_name'] == args.recipe):
                     print(
-                        "ERR: Recipe already exists in the database. Remove the existing recipe from the database, or rename the current recipe")
+                        "ERR: Recipe already exists in the database. Perhaps you want to try rerunning with 'update' instead.")
                     return
         else:
             print(f"Request failed with status code: {res.status_code}")
@@ -179,3 +179,32 @@ def inven_remove_recipe(args):
             print(f"Request failed with status code: {res.status_code}")
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
+
+
+def inven_shopping_list(args):
+    recipes = ' '.join(args.shoppingList).split(", ")
+    buy = {}
+    for r in recipes:
+        try:
+            route = "recipeIngredients"
+            res = requests.get(url + route, json={"recipe": r})
+            if res.status_code == 200:
+                if (res.json()):
+                    for i in res.json():
+                        route = "ingredientTotal"
+                        ingredient_count = requests.get(
+                            url + route, json={"ingredient": i['ingredient_name']})
+                        name = i['ingredient_name']
+                        count = max(0, i['ingredient_count'] -
+                                    ingredient_count.json())
+                        if (count != 0):
+                            if name in buy:
+                                buy[name] += count
+                            else:
+                                buy[name] = count
+                # for recipe in res.json():
+            else:
+                print(f"Request failed with status code: {res.status_code}")
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+    print(buy)
