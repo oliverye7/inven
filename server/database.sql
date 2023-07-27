@@ -3,7 +3,7 @@ CREATE DATABASE inven_app;
 CREATE TABLE ingredients (
     ingredient_id SERIAL PRIMARY KEY,
     ingredient_name VARCHAR(100) NOT NULL,
-    ingredient_count INT NOT NULL,
+    ingredient_count NUMERIC(10, 2) NOT NULL,
     purchase_date DATE NOT NULL
 );
 
