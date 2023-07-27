@@ -93,7 +93,7 @@ def inven_add_recipe(args):
         res = requests.get(url + route)
         if res.status_code == 200:
             for recipe in res.json():
-                if (recipe['recipe_name'] == args.path):
+                if (recipe['recipe_name'] == args.recipe):
                     print(
                         "ERR: Recipe already exists in the database. Remove the existing recipe from the database, or rename the current recipe")
                     return
@@ -103,12 +103,12 @@ def inven_add_recipe(args):
         print(f"An error occurred: {e}")
 
     route = "addRecipe"
-    path = "./recipes/" + args.path + ".toml"
+    path = "./recipes/" + args.recipe + ".toml"
     with open(path, "r") as file:
         toml_data = toml.load(file)
 
     recipe = {
-        "recipe_name": args.path,
+        "recipe_name": args.recipe,
         "ingredients": []
     }
 
@@ -158,5 +158,24 @@ def inven_use_recipe(args):
         else:
             print(res.json()["message"])
             print(res.json()["missing"])
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
+
+def inven_update_recipe(args):
+    inven_remove_recipe(args)
+    inven_add_recipe(args)
+    print(args.recipe + " has been updated ")
+
+
+def inven_remove_recipe(args):
+    route = "removeRecipe"
+    try:
+        res = requests.delete(url + route, json={"recipe": args.recipe})
+        if res.status_code == 200:
+            print(res.json())
+            # for recipe in res.json():
+        else:
+            print(f"Request failed with status code: {res.status_code}")
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")

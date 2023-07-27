@@ -31,7 +31,7 @@ if __name__ == "__main__":
     recipe_parser = subparsers.add_parser(
         "recipe", help="adds a recipe to the pantry memory")
     recipe_parser.add_argument(
-        "path", type=str, help="name of recipe WITHOUT .toml name")
+        "recipe", type=str, help="name of recipe")
     recipe_parser.set_defaults(func=helper.inven_add_recipe)
 
     make_parser = subparsers.add_parser(
@@ -39,6 +39,12 @@ if __name__ == "__main__":
     make_parser.add_argument(
         "recipe", type=str, help="name of recipe")
     make_parser.set_defaults(func=helper.inven_use_recipe)
+
+    update_parser = subparsers.add_parser(
+        "update", help="updates a recipe in the db. if the recipe isn't already in the db, adds the recipe to the db")
+    update_parser.add_argument(
+        "recipe", type=str, help="name of recipe to be updated")
+    update_parser.set_defaults(func=helper.inven_update_recipe)
 
     parser.add_argument("-p", "--pantry", action='store_true',
                         help="view current pantry")
