@@ -28,6 +28,18 @@ if __name__ == "__main__":
     use_parser.add_argument("ingredient", type=str, help="ingredient to use")
     use_parser.set_defaults(func=helper.inven_use_ingredient)
 
+    recipe_parser = subparsers.add_parser(
+        "recipe", help="adds a recipe to the pantry memory")
+    recipe_parser.add_argument(
+        "path", type=str, help="name of recipe WITHOUT .toml name")
+    recipe_parser.set_defaults(func=helper.inven_add_recipe)
+
+    make_parser = subparsers.add_parser(
+        "make", help="uses a recipe, if there are enough ingredients")
+    make_parser.add_argument(
+        "recipe", type=str, help="name of recipe")
+    make_parser.set_defaults(func=helper.inven_use_recipe)
+
     parser.add_argument("-p", "--pantry", action='store_true',
                         help="view current pantry")
 
