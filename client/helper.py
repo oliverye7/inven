@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+import toml
 
 url = "http://localhost:4000/"
 
@@ -80,8 +81,82 @@ def inven_see_pantry():
                 purchase_date_str = "purchase date: " + \
                     i['purchase_date'][0:10]
                 print(f"{ingredient_str.ljust(30)} {purchase_date_str}")
-                # print(res.json())
         else:
             print(f"Request failed with status code: {res.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
+
+def inven_add_recipe(args):
+    route = "recipes"
+    try:
+        res = requests.get(url + route)
+        if res.status_code == 200:
+            for recipe in res.json():
+                if (recipe['recipe_name'] == args.path):
+                    print(
+                        "ERR: Recipe already exists in the database. Remove the existing recipe from the database, or rename the current recipe")
+                    return
+        else:
+            print(f"Request failed with status code: {res.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
+    route = "addRecipe"
+    path = "./recipes/" + args.path + ".toml"
+    with open(path, "r") as file:
+        toml_data = toml.load(file)
+
+    recipe = {
+        "recipe_name": args.path,
+        "ingredients": []
+    }
+
+    for i in toml_data['ingredients']:
+        if (type(toml_data['ingredients'][i]) == int):
+            ingredient_data = {
+                "ingredient_name": i,
+                "ingredient_count": toml_data['ingredients'][i],
+            }
+            recipe["ingredients"].append(ingredient_data)
+
+    try:
+        res = requests.post(url + route, json=recipe)
+        if res.status_code == 200:
+            print(res.json())
+        else:
+            print(f"Request failed with status code: {res.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
+
+def inven_use_recipe(args):
+    route = 'recipes'
+    isRecipeKnown = False
+    try:
+        res = requests.get(url + route)
+        if res.status_code == 200:
+            for recipe in res.json():
+                if (args.recipe == recipe['recipe_name']):
+                    isRecipeKnown = True
+                    break
+            if (not isRecipeKnown):
+                print(f"ERR. Inven does not contain recipe: {args.recipe}")
+        else:
+            print(f"Request failed with status code: {res.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
+    route = 'useRecipe'
+    try:
+        res = requests.put(url + route, json={"recipe": args.recipe})
+        if res.status_code == 200:
+            print(res.json()['message'])
+            print("CONSUMED:")
+            for i in res.json()['consumed']:
+                print(i)
+        else:
+            print(res.json()["message"])
+            print(res.json()["missing"])
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")

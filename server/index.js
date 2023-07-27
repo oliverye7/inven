@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors"); // can be removed if only CLI (@kumarbros)
+const axios = require("axios")
 const db = require("./db");
 
 const app = express();
@@ -26,7 +27,6 @@ async function getIngredientTotal(ingredient) {
         "SELECT * FROM ingredients WHERE ingredient_name = $1;",
         [ingredient]
     );
-    console.log(ingredientQuery.rows)
     let sum = 0;
     for (const i of ingredientQuery.rows) {
         sum += i.ingredient_count;
@@ -47,9 +47,8 @@ app.post("/addIngredients", async(req, res) => {
             await db.query(addIngredient, [ingredient.name, ingredient.count, ingredient.date]);
         }
         const allRows = await db.query("SELECT * FROM ingredients;");
-        console.log(allRows.rows);
         
-        res.json("successfully added ingredients")
+        res.status(200).json("successfully added ingredients")
     } catch (error) {
         console.error(error.message);
     }
@@ -101,19 +100,14 @@ app.put("/removeIngredients", async(req, res) => {
     }
 })
 
-// USE a recipe (consumes ingredients)
-
 // VIEW the current state of the pantry (counts of ingredients and # of days ago it was bought)
 app.get("/pantry", async(req, res) => {
     try {
         console.log("pantry view request");
-        console.log(req.body);
         const viewPantry = await db.query(
             "SELECT * FROM ingredients;"
         );
-        console.log(viewPantry.rows)
         res.json(viewPantry.rows)
-        //res.json("Pantry request received")
     } catch (error) {
         console.error(error.message);
     }
@@ -134,7 +128,67 @@ app.post("/addRecipe", async(req, res) => {
         for (const ingredient of ingredients) {
             await db.query(addIngredientToRecipe, [recipeId, ingredient.ingredient_name, ingredient.ingredient_count]);
         }
-        res.json("successfully added ingredients")
+        res.json("successfully added recipe to pantry")
+    } catch (error) {
+        console.error(error.message);
+    }
+})
+
+// VIEW all available recipes
+app.get("/recipes", async(req, res) => {
+    try {
+        console.log("recipe view request");
+        const recipes = await db.query(
+            "SELECT recipe_name FROM recipes;"
+        );
+        res.json(recipes.rows)
+        //res.json("Pantry request received")
+    } catch (error) {
+        console.error(error.message);
+    }
+})
+
+// USE a recipe (consumes ingredients)
+app.put("/useRecipe", async(req, res) => {
+    try {
+        console.log("using recipe")
+        const {recipe} = req.body
+        let recipeId = await db.query("SELECT recipe_id FROM recipes WHERE recipe_name = $1", [recipe])
+        recipeId = recipeId.rows[0]['recipe_id']
+
+        let ingredients = await db.query("SELECT ingredient_name, ingredient_count FROM recipeIngredients WHERE recipe_id = $1", [recipeId])
+        let canUseRecipe = true
+        let missingIngredients = []
+        for (const ingredient of ingredients.rows) {
+            const avail = await getIngredientTotal(ingredient['ingredient_name'])
+            if (ingredient['ingredient_count'] > avail) {
+                canUseRecipe = false
+                missingIngredients.push({
+                    [ingredient['ingredient_name']]: ingredient['ingredient_count'] - avail
+                  });
+            }
+        }
+        if (!canUseRecipe) {
+            res.status(400).json({
+                "message": `cannot use recipe ${recipe}. missing the following ingredients:`,
+                "missing": missingIngredients
+            })
+        } else {
+            consumed = []
+            for (const ingredient of ingredients.rows) {
+                body = {
+                    name: ingredient['ingredient_name'],
+                    count: ingredient['ingredient_count']
+                };
+                consumed.push(body)
+                axios.put("http://localhost:4000/removeIngredients", body)
+                .catch(err => {
+                    console.error(err.message)
+                })
+            }
+            console.log(consumed)
+            res.json({"message": recipe + " consumed.", "consumed": consumed})
+        }
     } catch (error) {
         console.error(error.message);
     }

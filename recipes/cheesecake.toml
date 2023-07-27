@@ -1,0 +1,7 @@
+name = "cheesecake"
+kind = "recipe"
+
+[ingredients]
+cheese = 5
+cake = 2
+yourMom = "1 tbsp"
