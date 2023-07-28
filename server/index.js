@@ -1,15 +1,49 @@
 const express = require("express");
 const cors = require("cors"); // can be removed if only CLI (@kumarbros)
-const axios = require("axios")
 const db = require("./db");
+const axios = require('axios');
 
 const app = express();
 
 //middleware
 app.use(cors());
 app.use(express.json())
+app.use(async (req, res, next) => {
+  if (!req.body.access_token) {
+    res.status(401).end();
+    return;
+  }
+  try {
+    await authenticate(req.body.access_token);
+  } catch(error) {
+    res.status(401).end();
+    return;
+  }
+  next()
+});
 
 // HELPER(s)
+async function authenticate(token) {
+  const r = await axios.get("https://api.github.com/user", {
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+  const login = r.data.login;
+
+  const userQuery = await db.query(
+    "SELECT * FROM users WHERE login = $1 LIMIT 1;",
+    [login]
+  );
+  if (userQuery.rows.length !== 1) {
+    const msg = `User ${login} is not authorized to use inven.`;
+    console.log(msg);
+    throw new Error(msg);
+  }
+  return login;
+}
+
 function getMostRecentlyAdded(ingredientList) {
     const sortedIngredients = ingredientList.sort((a, b) => {
       const dateComparison = new Date(b.purchase_date) - new Date(a.purchase_date);
