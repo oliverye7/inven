@@ -23,7 +23,7 @@ if __name__ == "__main__":
     add_parser.set_defaults(func=helper.inven_add_ingredient)
 
     use_parser = subparsers.add_parser("use", help="use a single ingredient")
-    use_parser.add_argument("quantity", type=int,
+    use_parser.add_argument("quantity", type=str,
                             help="quantity of the ingredient to use")
     use_parser.add_argument("ingredient", type=str, help="ingredient to use")
     use_parser.set_defaults(func=helper.inven_use_ingredient)

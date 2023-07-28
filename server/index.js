@@ -65,6 +65,7 @@ app.put("/removeIngredients", async(req, res) => {
     try {
         console.log("update ingredients");
         let {name, count} = req.body;
+        count = parseFloat(count);
         const totalCount = await getIngredientTotal(name);
         let ingredientQuery = await db.query(
             "SELECT * FROM ingredients WHERE ingredient_name = $1;",
