@@ -1,6 +1,5 @@
 import argparse
-import helper
-
+from client import helper
 
 def main(args):
     if (args.pantry):
@@ -8,8 +7,7 @@ def main(args):
     elif (args.aggregatePantry):
         helper.inven_see_aggregate_pantry()
 
-
-if __name__ == "__main__":
+def cli():
     parser = argparse.ArgumentParser(
         description="Basic Argument Parsing Script")
 
@@ -70,3 +68,6 @@ if __name__ == "__main__":
         args.func(args)
     else:
         main(args)
+
+if __name__ == "__main__":
+    cli()
