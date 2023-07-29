@@ -12,7 +12,7 @@ def inven_add_ingredient(args):
     ingredients = args.split(", ")
     date = str(datetime.today().date())
 
-    data = {"ingredients": []}
+    data = {"ingredients": [], "access_token": auth.get_token() }
     for i in ingredients:
         count, name = i.split(" ")
         ingredient_data = {
@@ -23,6 +23,7 @@ def inven_add_ingredient(args):
         data["ingredients"].append(ingredient_data)
     try:
         res = requests.post(url + route, json=data)
+        res.raise_for_status()
         if res.status_code == 200:
             print(res.json())
         else:
@@ -36,10 +37,12 @@ def inven_use_ingredient(args):
     route = 'removeIngredients'
     data = {
         "name": args[1],
-        "count": args[0]
+        "count": args[0],
+        "access_token": auth.get_token(),
     }
     try:
         res = requests.put(url + route, json=data)
+        res.raise_for_status()
         if res.status_code == 200:
             print(res.json())
         else:
@@ -52,7 +55,8 @@ def inven_see_aggregate_pantry():
     route = 'pantry'
     pantry = {}
     try:
-        res = requests.get(url + route)
+        res = requests.get(url + route, json={"access_token": auth.get_token()})
+        res.raise_for_status()
         if res.status_code == 200:
             print("AGGREGATE PANTRY CONTENTS:")
             for i in res.json():
@@ -73,7 +77,8 @@ def inven_see_aggregate_pantry():
 def inven_see_pantry():
     route = 'pantry'
     try:
-        res = requests.get(url + route)
+        res = requests.get(url + route, json={"access_token": auth.get_token()})
+        res.raise_for_status()
         if res.status_code == 200:
             print("PANTRY CONTENTS")
             for i in res.json():
@@ -91,7 +96,8 @@ def inven_see_pantry():
 def inven_add_recipe(args):
     route = "recipes"
     try:
-        res = requests.get(url + route)
+        res = requests.get(url + route, json={"access_token": auth.get_token()})
+        res.raise_for_status()
         if res.status_code == 200:
             for recipe in res.json():
                 if (recipe['recipe_name'] == args.recipe):
@@ -110,7 +116,8 @@ def inven_add_recipe(args):
 
     recipe = {
         "recipe_name": args.recipe,
-        "ingredients": []
+        "ingredients": [],
+        "access_token": auth.get_token(),
     }
 
     for i in toml_data['ingredients']:
@@ -123,6 +130,7 @@ def inven_add_recipe(args):
 
     try:
         res = requests.post(url + route, json=recipe)
+        res.raise_for_status()
         if res.status_code == 200:
             print(res.json())
         else:
@@ -135,7 +143,8 @@ def inven_use_recipe(args):
     route = 'recipes'
     isRecipeKnown = False
     try:
-        res = requests.get(url + route)
+        res = requests.get(url + route, json={"access_token": auth.get_token()})
+        res.raise_for_status()
         if res.status_code == 200:
             for recipe in res.json():
                 if (args.recipe == recipe['recipe_name']):
@@ -150,7 +159,8 @@ def inven_use_recipe(args):
 
     route = 'useRecipe'
     try:
-        res = requests.put(url + route, json={"recipe": args.recipe})
+        res = requests.put(url + route, json={"recipe": args.recipe, "access_token": auth.get_token()})
+        res.raise_for_status()
         if res.status_code == 200:
             print(res.json()['message'])
             print("CONSUMED:")
@@ -172,7 +182,8 @@ def inven_update_recipe(args):
 def inven_remove_recipe(args):
     route = "removeRecipe"
     try:
-        res = requests.delete(url + route, json={"recipe": args.recipe})
+        res = requests.delete(url + route, json={"recipe": args.recipe, "access_token": auth.get_token()})
+        res.raise_for_status()
         if res.status_code == 200:
             print(res.json())
         else:
@@ -187,13 +198,14 @@ def inven_shopping_list(args):
     for r in recipes:
         try:
             route = "recipeIngredients"
-            res = requests.get(url + route, json={"recipe": r})
+            res = requests.get(url + route, json={"recipe": r, "access_token": auth.get_token()})
+            res.raise_for_status()
             if res.status_code == 200:
                 if (res.json()):
                     for i in res.json():
                         route = "ingredientTotal"
                         ingredient_count = requests.get(
-                            url + route, json={"ingredient": i['ingredient_name']})
+                                url + route, json={"ingredient": i['ingredient_name'], "access_token": auth.get_token()})
                         name = i['ingredient_name']
                         count = max(0, i['ingredient_count'] -
                                     ingredient_count.json())

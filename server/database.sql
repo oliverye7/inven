@@ -19,3 +19,13 @@ CREATE TABLE recipeIngredients (
     FOREIGN KEY (recipe_id) REFERENCES recipes (recipe_id),
     PRIMARY KEY (recipe_id, ingredient_name)
 );
+
+CREATE TABLE users (
+  login TEXT PRIMARY KEY
+);
+
+INSERT INTO users (login) VALUES ('rahulk29');
+INSERT INTO users (login) VALUES ('rohanku');
+INSERT INTO users (login) VALUES ('oliverye7');
+INSERT INTO users (login) VALUES ('oliver-ye7');
+
