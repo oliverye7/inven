@@ -3,7 +3,7 @@ from datetime import datetime
 import toml
 import auth
 
-url = "http://localhost:4000/"
+url = "https://inven.fly.dev/"
 
 
 def inven_add_ingredient(args):

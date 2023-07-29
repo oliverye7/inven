@@ -13,7 +13,7 @@ confirm pSQL works by running `psql -u postgres` in your terminal. you should be
 
 **_the table/db process is not yet automated. it is coming soon but you have to manually create it for now._**
 
-copy the code from `/server/db.sql` into the psql session:
+copy the code from `/server/database.sql` into the psql session:
 
 1) run `CREATE DATABASE inven_app;`
 2) move into the `inven_app` db by running `\c inven_app`. your command line should now have `inven_app=#`.

@@ -3,8 +3,6 @@ import helper
 
 
 def main(args):
-    # Your main script logic here
-    print(args)
     if (args.pantry):
         helper.inven_see_pantry()
     elif (args.aggregatePantry):
