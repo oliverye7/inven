@@ -19,14 +19,13 @@ copy the code from `/server/database.sql` into the psql session:
 2) move into the `inven_app` db by running `\c inven_app`. your command line should now have `inven_app=#`.
 3) create the three tables by copying them in one by one. 
 
+set the environment variable `DATABASE_URL` to the connection string for your newly created `inven_app` database.
+
 ___
 
 ### Client Setup
 
-1) (OPTIONAL) Run `source .inven_setup.sh` to set up an alias for the python script. This allows you to run the client with `inven <inputs` as opposed to `python3 client/runner.py <inputs>`.
-2) You're good to go! The general format of the CLI input will be `inven <command>`, where `<command>` is any valid command that inven takes. Run `inven help` to see a list of commands and examples (coming soon).
-
-
+From the root of this repository, run `pip install -e .`.
 
 ### Server Setup
 

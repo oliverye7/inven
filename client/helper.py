@@ -1,10 +1,9 @@
 import requests
 from datetime import datetime
 import toml
-import auth
+from client import auth
 
 url = "https://inven.fly.dev/"
-
 
 def inven_add_ingredient(args):
     route = 'addIngredients'
