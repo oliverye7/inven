@@ -11,4 +11,3 @@ curry-cubes = 1
 cornstarch = "1 tbsp"
 soy-sauce = { quantity = "1 tbsp", optional = true }
 
-troll = 1

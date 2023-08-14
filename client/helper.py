@@ -264,7 +264,7 @@ def inven_shopping_list(args):
         if opt > 0:
             if sep:
                 line += " + "
-            line += f"{opt} (optional)"
+            line += f"{opt} optional"
             sep = True
 
         if required_unchecked:
