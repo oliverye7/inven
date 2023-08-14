@@ -15,7 +15,7 @@ CREATE TABLE recipes (
 CREATE TABLE recipeIngredients (
     recipe_id INT NOT NULL,
     ingredient_name VARCHAR(127) NOT NULL,
-    ingredient_count INT,
+    ingredient_count NUMERIC,
     ingredient_quantity_str VARCHAR(127),
     optional BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (recipe_id) REFERENCES recipes (recipe_id),

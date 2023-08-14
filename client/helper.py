@@ -258,7 +258,7 @@ def inven_remove_recipe(args):
 
 
 def inven_shopping_list(args):
-    recipes = ' '.join(args.shoppingList).split(", ")
+    recipes = args.shoppingList
     # dict: ingredient name => dict(required count, optional count, required set flag, optional set flag)
     buy = {}
     for r in recipes:

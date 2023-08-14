@@ -5,7 +5,7 @@ kind = "recipe"
 chicken = 1
 potato = 1
 carrot = 3
-ginger = 1
+ginger = 0.5
 garlic = { quantity = 1, optional = true }
 curry-cubes = 1
 cornstarch = "1 tbsp"
