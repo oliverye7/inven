@@ -1,3 +1,4 @@
+.env_bash
 node_modules
 .vscode
 

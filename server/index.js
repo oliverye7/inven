@@ -8,19 +8,19 @@ const app = express();
 //middleware
 app.use(cors());
 app.use(express.json());
-app.use(async (req, res, next) => {
-  if (!req.body.access_token) {
-    res.status(401).end();
-    return;
-  }
-  try {
-    await authenticate(req.body.access_token);
-  } catch (error) {
-    res.status(401).end();
-    return;
-  }
-  next();
-});
+// app.use(async (req, res, next) => {
+//   if (!req.body.access_token) {
+//     res.status(401).end();
+//     return;
+//   }
+//   try {
+//     await authenticate(req.body.access_token);
+//   } catch (error) {
+//     res.status(401).end();
+//     return;
+//   }
+//   next();
+// });
 
 // HELPER(s)
 async function authenticate(token) {
@@ -170,12 +170,14 @@ app.post("/addRecipe", async (req, res) => {
     const recipeId = createRecipe.rows[0].recipe_id;
 
     const addIngredientToRecipe =
-      "INSERT INTO recipeIngredients (recipe_id, ingredient_name, ingredient_count) VALUES ($1, $2, $3);";
+      "INSERT INTO recipeIngredients (recipe_id, ingredient_name, ingredient_count, ingredient_quantity_str, optional) VALUES ($1, $2, $3, $4, $5);";
     for (const ingredient of ingredients) {
       await db.query(addIngredientToRecipe, [
         recipeId,
         ingredient.ingredient_name,
-        ingredient.ingredient_count,
+        ingredient.ingredient_count || null,
+        ingredient.ingredient_quantity_str || null,
+        ingredient.optional || false,
       ]);
     }
     res.json("successfully added recipe to pantry");
@@ -235,7 +237,7 @@ app.get("/recipeIngredients", async (req, res) => {
     recipeId = recipeId.rows[0]["recipe_id"];
 
     let ingredients = await db.query(
-      "SELECT ingredient_name, ingredient_count FROM recipeIngredients WHERE recipe_id = $1",
+      "SELECT ingredient_name, ingredient_count, ingredient_quantity_str, optional FROM recipeIngredients WHERE recipe_id = $1",
       [recipeId]
     );
 
@@ -257,7 +259,7 @@ app.put("/useRecipe", async (req, res) => {
     recipeId = recipeId.rows[0]["recipe_id"];
 
     let ingredients = await db.query(
-      "SELECT ingredient_name, ingredient_count FROM recipeIngredients WHERE recipe_id = $1",
+      "SELECT ingredient_name, ingredient_count FROM recipeIngredients WHERE recipe_id = $1 AND ingredient_count IS NOT NULL AND optional = FALSE",
       [recipeId]
     );
     let canUseRecipe = true;
