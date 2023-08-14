@@ -24,8 +24,18 @@ def cli():
     use_parser.add_argument("ingredient", type=str, help="ingredient to use")
     use_parser.set_defaults(func=helper.inven_use_ingredient)
 
+    recipes_parser = subparsers.add_parser(
+        "recipes", help="view all recipes")
+    recipes_parser.set_defaults(func=helper.inven_list_recipes)
+
+    view_recipe_parser = subparsers.add_parser(
+        "recipe", help="view a recipe")
+    view_recipe_parser.add_argument(
+        "recipe", type=str, help="name of recipe")
+    view_recipe_parser.set_defaults(func=helper.inven_view_recipe)
+
     recipe_parser = subparsers.add_parser(
-        "recipe", help="adds a recipe to the pantry memory")
+        "add-recipe", help="adds a recipe to the pantry memory")
     recipe_parser.add_argument(
         "recipe", type=str, help="name of recipe")
     recipe_parser.set_defaults(func=helper.inven_add_recipe)

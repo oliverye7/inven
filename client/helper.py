@@ -157,6 +157,20 @@ def inven_add_recipe(args):
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
 
+def inven_list_recipes(args):
+    route = "recipes"
+    try:
+        res = requests.get(url + route, json={"access_token": auth.get_token()})
+        res.raise_for_status()
+        if res.status_code == 200:
+            for recipe in res.json():
+                name = recipe['recipe_name']
+                print(name)
+        else:
+            print("ERR " + str(res.status_code) + ": " + res.json())
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
 
 def inven_use_recipe(args):
     route = 'recipes'
@@ -191,6 +205,38 @@ def inven_use_recipe(args):
     except requests.exceptions.RequestException as e:
         pass
 
+def inven_view_recipe(args):
+    route = 'useRecipe'
+    recipe = args.recipe
+    try:
+        route = "recipeIngredients"
+        res = requests.get(url + route, json={"recipe": recipe, "access_token": auth.get_token()})
+        res.raise_for_status()
+        if res.status_code == 200:
+            for i in res.json():
+                name = i['ingredient_name']
+                count, optional, unchecked = i.get('ingredient_count', 0), i['optional'], i.get('ingredient_quantity_str', None) is not None
+                if count is None:
+                    count = 0
+                count = int(count)
+                quantity_str = i.get('ingredient_quantity_str', '')
+
+                line = f'{name}:'
+                if count != 0:
+                    line += f' {count}'
+                else:
+                    line += f' {quantity_str}'
+
+                if optional:
+                    line += f' (optional)'
+
+                if unchecked:
+                    line += f', must be manually checked due to non-numeric units'
+                print(line)
+        else:
+            print("ERR " + str(res.status_code) + ": " + res.json())
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
 
 def inven_update_recipe(args):
     inven_remove_recipe(args)
@@ -223,9 +269,6 @@ def inven_shopping_list(args):
             if res.status_code == 200:
                 for i in res.json():
                     route = "ingredientTotal"
-                    # ingredient_count = requests.get(
-                    #         url + route, json={"ingredient": i['ingredient_name'], "access_token": auth.get_token()})
-                    # todo 
                     name = i['ingredient_name']
                     count, optional, unchecked = i.get('ingredient_count', 0), i['optional'], i.get('ingredient_quantity_str', None) is not None
                     if count is None:
