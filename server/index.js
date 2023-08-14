@@ -8,19 +8,19 @@ const app = express();
 //middleware
 app.use(cors());
 app.use(express.json());
-// app.use(async (req, res, next) => {
-//   if (!req.body.access_token) {
-//     res.status(401).end();
-//     return;
-//   }
-//   try {
-//     await authenticate(req.body.access_token);
-//   } catch (error) {
-//     res.status(401).end();
-//     return;
-//   }
-//   next();
-// });
+app.use(async (req, res, next) => {
+  if (!req.body.access_token) {
+    res.status(401).end();
+    return;
+  }
+  try {
+    await authenticate(req.body.access_token);
+  } catch (error) {
+    res.status(401).end();
+    return;
+  }
+  next();
+});
 
 // HELPER(s)
 async function authenticate(token) {
