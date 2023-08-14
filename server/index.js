@@ -163,6 +163,8 @@ app.post("/addRecipe", async (req, res) => {
   try {
     const { recipe_name, ingredients } = req.body;
 
+    await deleteRecipe(recipe_name);
+
     const createRecipe = await db.query(
       "INSERT INTO recipes (recipe_name) VALUES ($1) RETURNING recipe_id;",
       [recipe_name]
@@ -170,12 +172,14 @@ app.post("/addRecipe", async (req, res) => {
     const recipeId = createRecipe.rows[0].recipe_id;
 
     const addIngredientToRecipe =
-      "INSERT INTO recipeIngredients (recipe_id, ingredient_name, ingredient_count) VALUES ($1, $2, $3);";
+      "INSERT INTO recipeIngredients (recipe_id, ingredient_name, ingredient_count, ingredient_quantity_str, optional) VALUES ($1, $2, $3, $4, $5);";
     for (const ingredient of ingredients) {
       await db.query(addIngredientToRecipe, [
         recipeId,
         ingredient.ingredient_name,
-        ingredient.ingredient_count,
+        ingredient.ingredient_count || null,
+        ingredient.ingredient_quantity_str || null,
+        ingredient.optional || false,
       ]);
     }
     res.json("successfully added recipe to pantry");
@@ -213,6 +217,31 @@ app.delete("/removeRecipe", async (req, res) => {
   }
 });
 
+async function deleteRecipe(recipe) {
+  try {
+    let getRecipe = await db.query(
+      "SELECT recipe_id FROM recipes WHERE recipe_name = $1;",
+      [recipe]
+    );
+    console.log(getRecipe.rows);
+    if (getRecipe.rows.length === 0) {
+      throw new Error(`recipe ${recipe} not found`);
+    }
+
+    const recipeId = getRecipe.rows[0].recipe_id;
+
+    // Delete the recipe ingredients from the recipeIngredients table
+    await db.query("DELETE FROM recipeIngredients WHERE recipe_id = $1;", [
+      recipeId,
+    ]);
+
+    // Delete the recipe from the recipes table
+    await db.query("DELETE FROM recipes WHERE recipe_id = $1;", [recipeId]);
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
 // VIEW all available recipes
 app.get("/recipes", async (req, res) => {
   try {
@@ -235,7 +264,7 @@ app.get("/recipeIngredients", async (req, res) => {
     recipeId = recipeId.rows[0]["recipe_id"];
 
     let ingredients = await db.query(
-      "SELECT ingredient_name, ingredient_count FROM recipeIngredients WHERE recipe_id = $1",
+      "SELECT ingredient_name, ingredient_count, ingredient_quantity_str, optional FROM recipeIngredients WHERE recipe_id = $1",
       [recipeId]
     );
 
@@ -257,7 +286,7 @@ app.put("/useRecipe", async (req, res) => {
     recipeId = recipeId.rows[0]["recipe_id"];
 
     let ingredients = await db.query(
-      "SELECT ingredient_name, ingredient_count FROM recipeIngredients WHERE recipe_id = $1",
+      "SELECT ingredient_name, ingredient_count FROM recipeIngredients WHERE recipe_id = $1 AND ingredient_count IS NOT NULL AND optional = FALSE",
       [recipeId]
     );
     let canUseRecipe = true;

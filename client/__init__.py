@@ -24,8 +24,18 @@ def cli():
     use_parser.add_argument("ingredient", type=str, help="ingredient to use")
     use_parser.set_defaults(func=helper.inven_use_ingredient)
 
+    recipes_parser = subparsers.add_parser(
+        "recipes", help="view all recipes")
+    recipes_parser.set_defaults(func=helper.inven_list_recipes)
+
+    view_recipe_parser = subparsers.add_parser(
+        "recipe", help="view a recipe")
+    view_recipe_parser.add_argument(
+        "recipe", type=str, help="name of recipe")
+    view_recipe_parser.set_defaults(func=helper.inven_view_recipe)
+
     recipe_parser = subparsers.add_parser(
-        "recipe", help="adds a recipe to the pantry memory")
+        "add-recipe", help="adds a recipe to the pantry memory")
     recipe_parser.add_argument(
         "recipe", type=str, help="name of recipe")
     recipe_parser.set_defaults(func=helper.inven_add_recipe)
@@ -44,8 +54,10 @@ def cli():
 
     shopping_parser = subparsers.add_parser(
         "shopping", help="given a list of csv, generates a shopping list taking into acount existing ingredients in the pantry")
+    shopping_parser.add_argument("-r", "--raw", action='store_true',
+                        help="display raw shopping list, before subtracting items we already have")
     shopping_parser.add_argument(
-        "shoppingList", type=str, nargs="+", help="csv of recipe names")
+        "shoppingList", type=str, nargs="+", help="space separated recipe names")
     shopping_parser.set_defaults(func=helper.inven_shopping_list)
 
     login_parser = subparsers.add_parser(
