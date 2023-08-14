@@ -21,6 +21,8 @@ copy the code from `/server/database.sql` into the psql session:
 
 set the environment variable `DATABASE_URL` to the connection string for your newly created `inven_app` database.
 
+an example `DATABASE_URL` looks like this: `export DATABASE_URL="postgres://postgres:oliverye77@localhost:5432/inven_app"`
+
 ___
 
 ### Client Setup

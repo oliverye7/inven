@@ -4,6 +4,7 @@ import toml
 from client import auth
 
 url = "https://inven.fly.dev/"
+#url = "http://localhost:4000/" #(for local testing)
 
 def inven_add_ingredient(args):
     route = 'addIngredients'
@@ -16,7 +17,7 @@ def inven_add_ingredient(args):
         count, name = i.split(" ")
         ingredient_data = {
             "name": name,
-            "count": count,
+            "count": float(count),
             "date": date,
         }
         data["ingredients"].append(ingredient_data)
