@@ -295,8 +295,10 @@ def inven_shopping_list(args):
         ingredient_count = requests.get(
                 url + "ingredientTotal", json={"ingredient": ingredient, "access_token": auth.get_token()})
         ingredient_count = ingredient_count.json()
-        req = max(0, req - ingredient_count)
-        opt = max(0, opt - ingredient_count)
+
+        if not args.raw:
+            req = max(0, req - ingredient_count)
+            opt = max(0, opt - ingredient_count)
 
         line = f"{ingredient}: "
         sep = False
