@@ -3,8 +3,8 @@ from datetime import datetime
 import toml
 from client import auth
 
-# url = "https://inven.fly.dev/"
-url = "http://localhost:4000/" #(for local testing)
+url = "https://inven.fly.dev/"
+# url = "http://localhost:4000/" #(for local testing)
 
 def inven_add_ingredient(args):
     route = 'addIngredients'
