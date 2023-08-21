@@ -1,7 +1,0 @@
-name = "cheesecake"
-kind = "recipe"
-
-[ingredients]
-cheese = 5
-cake = 2
-your-mom = "1 tbsp"
