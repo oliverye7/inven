@@ -30,4 +30,5 @@ INSERT INTO users (login) VALUES ('rahulk29');
 INSERT INTO users (login) VALUES ('rohanku');
 INSERT INTO users (login) VALUES ('oliverye7');
 INSERT INTO users (login) VALUES ('oliver-ye7');
+INSERT INTO users (login) VALUES ('root2over2');
 

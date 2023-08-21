@@ -261,6 +261,9 @@ app.get("/recipeIngredients", async (req, res) => {
       "SELECT recipe_id FROM recipes WHERE recipe_name = $1",
       [recipe]
     );
+    if (!recipeId.rows[0]) {
+      res.status(404).json(`recipe ${recipe} not found`);
+    }
     recipeId = recipeId.rows[0]["recipe_id"];
 
     let ingredients = await db.query(

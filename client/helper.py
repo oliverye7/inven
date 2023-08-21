@@ -262,32 +262,29 @@ def inven_shopping_list(args):
     # dict: ingredient name => dict(required count, optional count, required set flag, optional set flag)
     buy = {}
     for r in recipes:
-        try:
-            route = "recipeIngredients"
-            res = requests.get(url + route, json={"recipe": r, "access_token": auth.get_token()})
-            res.raise_for_status()
-            if res.status_code == 200:
-                for i in res.json():
-                    route = "ingredientTotal"
-                    name = i['ingredient_name']
-                    count, optional, unchecked = i.get('ingredient_count', 0), i['optional'], i.get('ingredient_quantity_str', None) is not None
-                    if count is None:
-                        count = 0
-                    count = int(count)
-                    if name not in buy:
-                        buy[name] = {"required": 0, "optional": 0, "required_unchecked": False, "optional_unchecked": False}
-                    if optional:
-                        buy[name]["optional"] += count
-                        if unchecked:
-                            buy[name]["optional_unchecked"] = True
-                    else:
-                        buy[name]["required"] += count
-                        if unchecked:
-                            buy[name]["required_unchecked"] = True
-            else:
-                print("ERR " + str(res.status_code) + ": " + res.json())
-        except requests.exceptions.RequestException as e:
-            print(f"An error occurred: {e}")
+        route = "recipeIngredients"
+        res = requests.get(url + route, json={"recipe": r, "access_token": auth.get_token()})
+        if res.status_code == 200:
+            for i in res.json():
+                route = "ingredientTotal"
+                name = i['ingredient_name']
+                count, optional, unchecked = i.get('ingredient_count', 0), i['optional'], i.get('ingredient_quantity_str', None) is not None
+                if count is None:
+                    count = 0
+                count = int(count)
+                if name not in buy:
+                    buy[name] = {"required": 0, "optional": 0, "required_unchecked": False, "optional_unchecked": False}
+                if optional:
+                    buy[name]["optional"] += count
+                    if unchecked:
+                        buy[name]["optional_unchecked"] = True
+                else:
+                    buy[name]["required"] += count
+                    if unchecked:
+                        buy[name]["required_unchecked"] = True
+        else:
+            print("ERR " + str(res.status_code) + ": " + res.json())
+            res.raise_for_status(())
 
     for ingredient in buy:
         data = buy[ingredient]
