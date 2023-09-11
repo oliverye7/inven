@@ -2,6 +2,7 @@ import requests
 import time
 import os
 import sys
+import webbrowser
 from pathlib import Path
 
 client_id = "Iv1.479cca827e65c19d"
@@ -23,6 +24,7 @@ def login():
     verification_uri, user_code, device_code, interval = r['verification_uri'], r['user_code'], r['device_code'], r['interval']
     print(f"Copy this code: {user_code}")
     print(f"Enter the code at this URL: {verification_uri}")
+    webbrowser.open(verification_uri)
 
     token = poll_for_token(device_code, interval)
     p = token_file_path()
